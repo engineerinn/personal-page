@@ -17,7 +17,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 
 const drawerWidth = 240;
-const navItems = [['Expertise', 'expertise'], ['History', 'history'], ['Projects', 'projects'], ['Contact', 'contact']];
+const navItems = [['Core Competencies', 'expertise'],
+ ['Professional Experience', 'professional-experience'],
+  ['Articles', 'articles'],
+  ['Publications', ''], 
+  ['Awards', ''],
+  ['Projects', 'projects']];
 
 function Navigation({parentToChild, modeChange}: any) {
 
@@ -30,6 +35,7 @@ function Navigation({parentToChild, modeChange}: any) {
     setMobileOpen((prevState) => !prevState);
   };
 
+  //Set up event listener for scroll
   useEffect(() => {
     const handleScroll = () => {
       const navbar = document.getElementById("navigation");
@@ -57,7 +63,7 @@ function Navigation({parentToChild, modeChange}: any) {
     }
   };
 
-  const drawer = (
+const drawer = (
     <Box className="navigation-bar-responsive" onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <p className="mobile-menu-top"><ListIcon/>Menu</p>
       <Divider />
@@ -87,11 +93,6 @@ function Navigation({parentToChild, modeChange}: any) {
           >
             <MenuIcon />
           </IconButton>
-          {mode === 'dark' ? (
-            <LightModeIcon onClick={() => modeChange()}/>
-          ) : (
-            <DarkModeIcon onClick={() => modeChange()}/>
-          )}
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {navItems.map((item) => (
               <Button key={item[0]} onClick={() => scrollToSection(item[1])} sx={{ color: '#fff' }}>
@@ -99,6 +100,11 @@ function Navigation({parentToChild, modeChange}: any) {
               </Button>
             ))}
           </Box>
+          {mode === 'dark' ? (
+            <LightModeIcon onClick={() => modeChange()}/>
+          ) : (
+            <DarkModeIcon onClick={() => modeChange()}/>
+          )}
         </Toolbar>
       </AppBar>
       <nav>
