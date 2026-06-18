@@ -165,3 +165,63 @@ A React 18 + TypeScript single-page portfolio site for Rin Nadia, built on Creat
 **Response:** The Articles section (`.projects-container` in `Project.scss`) sets its content inset with `padding: 5% 10%`, so content begins at 10% from the left. The footer's divs used `margin-left: 20px`. Changed it to `margin-left: 10%` in `Footer.scss` to match.
 
 dth). `display: flex` + `flex-direction: column` stacks children vertically instead of side by side. `text-align: left` left-aligns text. The nested `svg { color: white; }` is a descendant selector applying to every `<svg>` inside the container; FontAwesome icons render as SVGs and inherit the CSS `color` property, so this makes all those icons white.
+
+---
+
+## 2026-06-18
+
+**Prompt:** In the Core Competencies section, supply sample wording to describe the three points: End-to-end Engineering, Data and ETL Engineering, and Applied AI/ML/Research (currently Lorem Ipsum in `Expertise.tsx`).
+
+**Response:** Provided two wording variants (concise + fuller) for each of the three cards, written to match the existing MUI Chip tech stacks:
+
+- **End-to-end Engineering** — full-stack web app delivery: responsive React/TypeScript/SASS front ends, Flask/Python/PostgreSQL back ends, full lifecycle ownership (architecture → testing with Postman → deployment).
+- **Data and ETL Engineering** — pipelines turning raw/messy data into trusted assets: extraction + web scraping (Python, Pandas, Selenium), transformation, Snowflake/SQL warehousing, cloud deployment on AWS/Azure with Docker + GitHub Actions.
+- **Applied AI and ML and Research** — practical LLM/RAG systems with OpenAI, Groq, LangChain, LlamaIndex; vector search via Qdrant, Hugging Face models, shipped as Streamlit apps; bridging research and application.
+
+Offered to drop the chosen variants directly into `Expertise.tsx` once the user picks options per section.
+
+**Prompt:** Expressed worry about overselling — was previously grilled by a manager on every CV line; product was research/prototype only, never production; always works on a team. Then uploaded CV and asked for drafts.
+
+**Response:** Read the CV (`cv-en-kotra-20260530.pdf`). Reframed the concern: the fix for interview-defensibility is not weaker wording but wording tied to real, named projects with a rehearsed story. Reassured that (1) research prototypes/POCs are legitimate and her CV already labels them honestly, and (2) team-based work is the expected norm — the skill is stating her specific contribution. Then replaced all three Lorem Ipsum descriptions in `Expertise.tsx` with drafts grounded in specific CV evidence:
+
+- **End-to-end Engineering** — RAG chatbot prototype (owned end-to-end, infra → LLM eval), PyQt config-management desktop app built from scratch, Vue/Node/WebSocket real-time dashboards; explicitly notes working within engineering teams.
+- **Data and ETL Engineering** (her strongest, ~10 yrs) — SKHynix PDF/OCR pipeline, Verint billing ETL for 170M+ subscribers, Huawei report automation; Spring Batch, Python, SQL, Elasticsearch, Kibana.
+- **Applied AI and ML and Research** — RAG/LLM with LangChain/Elasticsearch/Cohere, graduate biometric+ML research (LSTM data augmentation), IEEE publications, KICS Best Paper Award.
+
+Each draft kept deliberately at or below the CV's own claims so every phrase maps to documented work she can defend.
+
+**Prompt:** Shared her own rewrite of the End-to-end Engineering blurb (adding feasibility study / investment cost analysis / tech-stack evaluation, more general, no named project) and asked for feedback, then approved a polished version.
+
+**Response:** Affirmed the content instinct — the feasibility/cost/business-case angle is a genuine differentiator backed by her CV (C-level feasibility study, executive presentations). Fixed grammar issues: the second sentence was a verbless fragment ("Once having...") and tenses were inconsistent. Delivered a present-tense, parallel-structured version preserving her additions and voice; flagged that keeping it general means having a concrete example ready for interviews (RAG chatbot). Replaced the End-to-end Engineering paragraph in `Expertise.tsx` with the approved version:
+
+"Build complete systems across the stack, from backend architecture to frontend interfaces. I've owned features end-to-end — from infrastructure feasibility study and investment cost analysis through technology-stack evaluation to implementation — and built applications from scratch. I work primarily within engineering teams, owning my components through to delivery."
+
+**Prompt:** Can I have text alignment as justify?
+
+**Response:** Added `p { text-align: justify; }` scoped to `.skills-container .skills-grid .skill` in `Expertise.scss`, so only the description paragraphs are justified while headings and chips stay left-aligned.
+
+**Prompt:** Shared a draft for the ETL/Data Engineering competencies section and asked for feedback. Draft: "I design and maintain data pipelines that move and transform data reliably at scale. From existing service reengineering to new pipeline development, I've worked with ETL systems across telecom, finance and enterprise — automating data extraction from various sources, new business workflow implementation in a billing ETL pipeline which serving 170M+ subscribers and automating large-scale report generation."
+
+**Response:** Praised the content (range across industries + 170M+ figure) but flagged two issues: a grammar slip ("which serving") and a non-parallel list (mixing gerund "automating" with noun "implementation"). Delivered a tightened rewrite with parallel verb structure and the reengineering-vs-new-development point folded into one clause:
+
+"I design and maintain data pipelines that move and transform data reliably at scale. Across telecom, finance, and enterprise, I've reengineered existing services and built new pipelines — automating data extraction from diverse sources, implementing new business workflows in a billing ETL pipeline serving 170M+ subscribers, and automating large-scale report generation."
+
+Also noted that "reliably at scale" and "large-scale" both lean on scale, suggesting one could be swapped for a reliability/accuracy angle for more range. Offered to draft a variant.
+
+**Prompt:** yes (then, after a reliability variant was drafted, chose the "Scale version" to insert).
+
+**Response:** Drafted a reliability-angle variant (swapping the second "large-scale" for "building automated reporting with validation and monitoring to keep outputs accurate and trustworthy"). User chose the Scale version. Replaced the ETL paragraph in `Expertise.tsx` with the tightened scale wording ("Across telecom, finance, and enterprise, I've reengineered existing services and built new pipelines — automating data extraction from diverse sources, implementing new business workflows in a billing ETL pipeline serving 170M+ subscribers, and automating large-scale report generation."), keeping the trailing tech-stack sentence (Spring Batch, Python, SQL, Elasticsearch, Kibana) since those tools aren't in the chips.
+
+**Prompt:** Shared a draft for the third (Applied AI/ML/Research) section and asked for feedback. Draft: "I work at the intersection of applied AI and research. I conducted research on a feasibility study AI application and security framework convergence. As I realize the advancement result of AI study must be brought to the real word for a greater good, I pour my passion on how to serve real life demand with AI incorporating solutions."
+
+**Response:** Advised against this version. Flagged grammar issues (garbled noun stack "a feasibility study AI application and security framework convergence," "real word" → "real world," awkward "pour my passion on how to serve real life demand with AI incorporating solutions"). Bigger concern: it trades the current card's concrete, defensible evidence (RAG/LLM, LangChain, IEEE publications, Best Paper Award, LSTM research) for vague passion language, which is harder to defend in an interview given her prior experience being grilled on CV lines. Offered a version keeping her "AI for real-world good" mission voice but anchored to the named research and systems. Not yet inserted — awaiting her choice on framing.
+
+**Prompt:** Pointed out the RAG/LangChain/Elasticsearch + award-winning biometric research claims can be found on her CV, referencing the CV "download" button on the site.
+
+**Response:** Confirmed the wording is defensible — it maps to the documented CV summary from the earlier session (RAG/LLM with LangChain/Elasticsearch/Cohere, biometric + ML research with LSTM augmentation, IEEE publications, KICS Best Paper Award). Noted the actual CV PDF isn't in the repo or attached this session, so couldn't re-verify line by line. More importantly, discovered the CV download button is not wired up: in `Navigation.tsx` the nav item is `['CV', '']` (empty target, click does nothing), and no CV PDF exists anywhere in the repo (`public/` only has favicon/logo/manifest). Offered to wire it up once she provides the PDF (drop into `public/`, point the CV nav item at it).
+
+**Prompt:** Uploaded the CV (`cv-en-kotra-20260530.pdf`). Asked to rename it to `rinnadia-cv`, put it in the public folder, wire it to the CV button, then explain how it was done.
+
+**Response:** (1) Copied the uploaded CV into `public/rinnadia-cv.pdf` (files in `public/` are served at the site root). (2) Wired the button in `Navigation.tsx`: changed the CV nav entry from `['CV', '']` (empty target = dead click) to `['CV', 'cv']`, added an `openCv()` helper (`window.open('/rinnadia-cv.pdf', '_blank', 'noopener,noreferrer')`) and a `handleNavClick(target)` router that opens the PDF when target is `'cv'` and otherwise calls `scrollToSection`. Pointed both the desktop Button and mobile Drawer ListItemButton at `handleNavClick`. Used root-absolute `/rinnadia-cv.pdf` so it resolves in dev and at the deployed root domain. Not live until `npm run deploy`.
+
+Debugging note: the shell mount briefly held a stale, truncated copy of `Navigation.tsx`, producing phantom JSX "no closing tag" errors in `tsc`; the real file (via the Read tool / E: drive) was complete. Rewrote the file through the shell channel (which syncs to the project folder) and confirmed a clean typecheck for `Navigation.tsx` (138 lines; remaining tsc errors are pre-existing project-wide PNG-import / untyped `index.js` issues that Vite handles at build time). Two stray debug files (`src/components/Navigation_ORIG.tsx` backup and `public/_synctest.txt`) could not be deleted (mount permission denied; user declined the delete-permission prompt) — flagged for manual cleanup via `git clean -f` or File Explorer.
