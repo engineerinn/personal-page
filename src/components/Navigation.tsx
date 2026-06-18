@@ -20,7 +20,7 @@ const drawerWidth = 240;
 const navItems = [['Core Competencies', 'expertise'],
  ['Professional Experience', 'professional-experience'],
     ['Articles', 'articles'],
-  ['CV', '']];
+  ['CV', 'cv']];
 
 function Navigation({parentToChild, modeChange}: any) {
 
@@ -51,14 +51,24 @@ function Navigation({parentToChild, modeChange}: any) {
   }, []);
 
   const scrollToSection = (section: string) => {
-    console.log(section)
-    const expertiseElement = document.getElementById(section);
-    if (expertiseElement) {
-      expertiseElement.scrollIntoView({ behavior: 'smooth' });
-      console.log('Scrolling to:', expertiseElement);  // Debugging: Ensure the element is found
+    const targetElement = document.getElementById(section);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' });
     } else {
-      console.error('Element with id "expertise" not found');  // Debugging: Log error if element is not found
+      console.error(`Element with id "${section}" not found`);
     }
+  };
+
+  const openCv = () => {
+    window.open('/rinnadia-cv.pdf', '_blank', 'noopener,noreferrer');
+  };
+
+  const handleNavClick = (target: string) => {
+    if (target === 'cv') {
+      openCv();
+      return;
+    }
+    scrollToSection(target);
   };
 
 const drawer = (
@@ -68,7 +78,7 @@ const drawer = (
       <List>
         {navItems.map((item) => (
           <ListItem key={item[0]} disablePadding>
-            <ListItemButton sx={{ textAlign: 'center' }} onClick={() => scrollToSection(item[1])}>
+            <ListItemButton sx={{ textAlign: 'center' }} onClick={() => handleNavClick(item[1])}>
               <ListItemText primary={item[0]} />
             </ListItemButton>
           </ListItem>
@@ -93,7 +103,7 @@ const drawer = (
           </IconButton>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {navItems.map((item) => (
-              <Button key={item[0]} onClick={() => scrollToSection(item[1])} sx={{ color: '#fff' }}>
+              <Button key={item[0]} onClick={() => handleNavClick(item[1])} sx={{ color: '#fff' }}>
                 {item[0]}
               </Button>
             ))}
@@ -111,7 +121,7 @@ const drawer = (
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
