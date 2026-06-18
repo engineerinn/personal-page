@@ -35,7 +35,6 @@ function App() {
             <Expertise/>
             <Timeline/>
             <Articles/>
-            <Publication/>
         </FadeIn>
         <Navigation parentToChild={{mode}} modeChange={handleModeChange}/>
         <Footer />
