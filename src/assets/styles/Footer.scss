@@ -1,7 +1,11 @@
 footer {
-    text-align: center;
+    text-align: left;
     padding-top: 50px;
     padding-bottom: 50px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15); // slim white line
+    h4 {
+        margin: 0 0 10px;
+    }
 
     svg {
         width: 1.1em !important;
@@ -11,5 +15,14 @@ footer {
 
     p {
         font-size: 0.8em;
+    }
+
+    div{
+        margin-left: 10%;
+
+    }
+
+    h5{
+        margin-top: 0;
     }
 }
