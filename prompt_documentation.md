@@ -225,3 +225,36 @@ Also noted that "reliably at scale" and "large-scale" both lean on scale, sugges
 **Response:** (1) Copied the uploaded CV into `public/rinnadia-cv.pdf` (files in `public/` are served at the site root). (2) Wired the button in `Navigation.tsx`: changed the CV nav entry from `['CV', '']` (empty target = dead click) to `['CV', 'cv']`, added an `openCv()` helper (`window.open('/rinnadia-cv.pdf', '_blank', 'noopener,noreferrer')`) and a `handleNavClick(target)` router that opens the PDF when target is `'cv'` and otherwise calls `scrollToSection`. Pointed both the desktop Button and mobile Drawer ListItemButton at `handleNavClick`. Used root-absolute `/rinnadia-cv.pdf` so it resolves in dev and at the deployed root domain. Not live until `npm run deploy`.
 
 Debugging note: the shell mount briefly held a stale, truncated copy of `Navigation.tsx`, producing phantom JSX "no closing tag" errors in `tsc`; the real file (via the Read tool / E: drive) was complete. Rewrote the file through the shell channel (which syncs to the project folder) and confirmed a clean typecheck for `Navigation.tsx` (138 lines; remaining tsc errors are pre-existing project-wide PNG-import / untyped `index.js` issues that Vite handles at build time). Two stray debug files (`src/components/Navigation_ORIG.tsx` backup and `public/_synctest.txt`) could not be deleted (mount permission denied; user declined the delete-permission prompt) — flagged for manual cleanup via `git clean -f` or File Explorer.
+
+---
+
+## 2026-06-18
+
+**Prompt:** How to make the "Software Engineering, Digital Infrastructure, AI Transformation" white words become black when the website switches to light mode?
+
+**Response:** The subtitle lives in a `.social_icons` div inside `.about-section .content` in `Main.tsx`, and `Main.scss` hardcodes `color: white` on `.social_icons`, so it stays white in both themes. Following the existing `.light-mode`/`.dark-mode` descendant-selector pattern, added a light-mode override at the top of `Main.scss`:
+
+```scss
+.light-mode .about-section .content .social_icons,
+.light-mode .about-section .content .mobile_social_icons {
+    color: black;
+}
+```
+
+This turns both the subtitle text and the social icons (which inherit `color`) black in light mode while leaving dark mode unchanged. Not live until `npm run deploy`.
+
+---
+
+## 2026-06-18
+
+**Prompt:** I want to make the slim line (footer divider) black in light mode too.
+
+**Response:** The slim line is the footer's `border-top: 1px solid rgba(255, 255, 255, 0.15)` in `Footer.scss`, which is white in both themes. Added a light-mode override above the `footer` rule:
+
+```scss
+.light-mode footer {
+    border-top-color: rgba(0, 0, 0, 0.15); // slim black line in light mode
+}
+```
+
+The `.light-mode` class on `.main-container` scopes it, so the divider is black in light mode and stays white in dark mode. Not live until `npm run deploy`.
