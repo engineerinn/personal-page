@@ -144,4 +144,24 @@ A React 18 + TypeScript single-page portfolio site for Rin Nadia, built on Creat
 
 **Prompt:** Should I fork his repo?
 
-**Response:** Advised against forking. Forking is for tracking upstream updates or contributing back, neither of which applies to a heavily-customized personal portfolio (already diverged via Vite migration, Medium RSS, own content). A fork is permanently labeled "forked from..." and shares the upstream network graph, which is awkward for what is now the user's own site; the existing standalone `personal-page` repo has clean independent history. Forking is irrelevant to licensing — MIT credit is satisfied by keeping the LICENSE file. Recommended: keep the standalone repo, add a README credit line, and star the original repo to show appreciation.
+**Response:** Advised against forking. Forking is for tracking upstream updates or contributing back, neither of which applies to a heavily-customized personal portfolio (already diverged via Vite migration, Medium RSS, own content). A fork is permanently labeled "forked from..." and shares the upstream network graph, which is awkward for what is now the user's own site; the existing standalone `personal-page` repo has clean independent history. Forking is irrelevant to licensing — MIT credit is satisfi
+**Prompt:** why the white space still shows even after min-height:100vh patch applied?
+
+**Response:** `min-height: 100vh` didn't help because the portfolio content already exceeds 100vh — the fix only works when the container is shorter than the viewport. The actual cause was **margin collapsing**: the `<h4>` inside `<footer>` has a default browser bottom margin that collapses outside `.main-container`, pushing a white gap below it. Fixed with two changes:
+1. `Footer.scss` — added `h4 { margin: 0 0 10px; }` to neutralize the collapsing margin.
+2. `index.scss` — set `background-color: #0d1116` on both `html` and `body` as a backstop so any remaining gap matches the dark background instead of showing white.
+
+---
+
+## 2026-06-18
+
+**Prompt:** how to draw white slim line in footer line in this example? (screenshot of a dark footer with a faint horizontal divider above the copyright text)
+
+**Response:** Explained the slim divider is a top border on the footer. Recommended adding `border-top: 1px solid rgba(255, 255, 255, 0.15);` to `footer` in `Footer.scss` for a faint, slim white line on the dark background. Notes: use `1px` (or `0.5px` on high-DPI) for slimness; raise the alpha or use solid `#fff` for a brighter line; for a line inset from the edges (not full width), use a `footer::before` pseudo-element with absolute positioning and `left/right` insets instead of a border. Offered to apply the `border-top` versi
+## Prompt: Align footer div left margin with Articles section
+
+**Prompt:** I want to add left margin on div in footer to be same as articles section. How do I do it?
+
+**Response:** The Articles section (`.projects-container` in `Project.scss`) sets its content inset with `padding: 5% 10%`, so content begins at 10% from the left. The footer's divs used `margin-left: 20px`. Changed it to `margin-left: 10%` in `Footer.scss` to match.
+
+dth). `display: flex` + `flex-direction: column` stacks children vertically instead of side by side. `text-align: left` left-aligns text. The nested `svg { color: white; }` is a descendant selector applying to every `<svg>` inside the container; FontAwesome icons render as SVGs and inherit the CSS `color` property, so this makes all those icons white.
