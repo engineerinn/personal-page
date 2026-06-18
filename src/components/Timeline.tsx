@@ -26,7 +26,7 @@ function Timeline() {
             iconStyle={{ background: '#6B1558', color: 'rgb(39, 40, 34)' }}
             icon={<FontAwesomeIcon icon={faCode} />}
           >
-            <h3 className="vertical-timeline-element-title">Freelance Software Engineer and Technical Writer</h3>
+            <h3 className="vertical-timeline-element-title">Software Engineer and Technical Writer</h3>
             <h4 className="vertical-timeline-element-subtitle">Global</h4>
             <p>
               Full-stack Web Development, GenAI/LLM, Project Management, Business Development
