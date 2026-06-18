@@ -2,6 +2,11 @@
     background-color: rgba(0, 0, 0, 0.2);
 }
 
+.light-mode .about-section .content .social_icons,
+.light-mode .about-section .content .mobile_social_icons {
+    color: black;
+}
+
 .about-section {
     display: flex;
     gap: 30px;
