@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
-import 'katex/dist/katex.min.css'; // LaTeX math rendering
-import 'highlight.js/styles/github-dark.css'; // code block syntax highlighting
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
