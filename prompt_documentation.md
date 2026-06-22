@@ -266,3 +266,41 @@ The `.light-mode` class on `.main-container` scopes it, so the divider is black 
 **Prompt:** How can I reduce gap between Rin Nadia and the words below? I've already add margin-bottom in h1 of main.scss but it seems not working.
 
 **Response:** Diagnosed that the gap was caused by the `h1`'s default `line-height` (~1.2), not margin. At `font-size: 5em` the default line-height creates a large empty band below the text baseline, so the `margin-bottom: -10px` was negligible by comparison. Fix in `src/assets/styles/Main.scss`: added `line-height: 1;` to the `.about-section .content h1` rule and reset `margin-bottom` to `0px`. Lower the line-height further (e.g. `0.9`) to tighten the gap even more.
+
+---
+
+## 2026-06-22
+
+**Prompt:** As you know I have section articles, do you think I should post the articles to Medium or post in my own website like https://steveimm.id/posts/from-ode-to-node/? And what about the posting technology that website used — does she use MD files?
+
+**Response:** Fetched the referenced site. It's built with **Jekyll** (static site generator) using the **Minimal Mistakes** theme — stated in the footer ("Powered by Jekyll & Minimal Mistakes"). Posts are authored as **Markdown (`.md`) files with YAML front matter**, converted to static HTML at build time, almost certainly hosted on GitHub Pages. Math renders via MathJax/KaTeX, code blocks get syntax highlighting — standard Jekyll features.
+
+Recommendation: **post on your own site, optionally cross-post to Medium** with a canonical link back. Reasons favoring own site for technical articles: ownership (own domain/URLs, no paywall), SEO/portfolio value accrues to you, full control over math + code rendering (Medium is poor at both), and a pleasant git-versioned Markdown workflow. Medium's only real advantage is built-in discovery — addressed by cross-posting with `rel=canonical`.
+
+Noted the user's portfolio is React/CRA (not a static-site generator), so a blog needs a different approach. Asked how she'd want to add posts; she chose **Markdown-in-React** (keep one codebase).
+
+Laid out the Markdown-in-React approach: store posts as `.md` files (simplest: in `public/`, fetched at runtime); render with `react-markdown` + `remark-gfm` + `remark-math`/`rehype-katex` (for her LaTeX-heavy articles) + a syntax-highlighting plugin; parse front matter with `gray-matter` or a small TS manifest. Key wrinkle: the app currently has **no router** (nav uses `scrollIntoView` on section IDs), so real per-post URLs (`/posts/slug`) would need `react-router-dom` — recommended for sharing/SEO. Offered to implement the full pipeline (router, `PostList` + `Post` components, math + code highlighting, sample post) matching existing SCSS/dark-mode patterns. Awaiting go-ahead.
+
+**Prompt:** So recap and break down the steps to add "markdown-powered posts" in React.
+
+**Response:** Gave a 9-step breakdown (no code changes yet, awaiting go-ahead to implement):
+
+1. **Install deps** — `react-router-dom`, `react-markdown`, `remark-gfm`, `remark-math`, `rehype-katex`, `rehype-highlight`, `gray-matter`.
+2. **Add a router** — wrap app in `<BrowserRouter>`; routes `/` (existing portfolio), `/posts` (list), `/posts/:slug` (post). Flagged GitHub Pages client-routing fix needed (`404.html` redirect trick or `HashRouter`).
+3. **Store posts as `.md` in `public/posts/`** — served as static assets, `fetch()`ed at runtime to avoid CRA config changes; each file has YAML front matter (title, date, excerpt, tags).
+4. **Maintain a manifest** — `public/posts/index.json` (or TS file) listing slug + metadata, since CRA can't list a folder at runtime.
+5. **Build `PostList` + `Post` components** — list reuses `Project.scss` card grid; `Post` reads `:slug`, fetches the MD, splits front matter with `gray-matter`, renders body.
+6. **Wire the renderer** — `react-markdown` with `remarkPlugins={[remarkGfm, remarkMath]}` and `rehypePlugins={[rehypeKatex, rehypeHighlight]}`; import KaTeX CSS + a highlight.js theme CSS once in `index.tsx`.
+7. **Style + theme** — SCSS for post typography + a `.light-mode` override following existing descendant-selector pattern.
+8. **Hook into nav** — point the currently-empty "Blogs"/"Posts" nav target at `/posts` via router link.
+9. **Test & deploy** — verify math, code highlighting, theme switch, and direct `/posts/slug` URL load; then `npm run deploy`.
+
+Called out the two CRA/static-host quirks (GitHub Pages routing, no runtime folder listing → manifest) as the trickiest parts, not Markdown itself. Offered to implement all of it now.
+
+**Prompt:** Didn't understand the explanation — asked for it simpler and clearer, and corrected that the project no longer uses CRA, it now uses **Vite**.
+
+**Response:** Verified via `package.json` — confirmed Vite (`vite`/`vite build` scripts, `@vitejs/plugin-react`, `gh-pages -d dist`, custom domain `homepage: https://rinnadia.com`). Re-explained in plain language with a "recipe box" mental model: you write posts as plain Markdown text files; `react-markdown` prints them as web pages; a router gives each its own URL.
+
+Key correction from the CRA version: **Vite removes the manual manifest step** — `import.meta.glob('../posts/*.md', { query: '?raw', import: 'default', eager: true })` auto-imports every `.md` file at build time, so no `index.json` to maintain and no runtime `fetch`. Posts live in `src/posts/` (not `public/`).
+
+Simplified 7-step plan: (1) `npm install react-router-dom react-markdown remark-gfm remark-math rehype-katex rehype-highlight`; (2) create `src/posts/*.md` with YAML front matter; (3) auto-discover with `import.meta.glob`; (4) build a list page + a post page (post page feeds Markdown to `react-markdown` for math + code); (5) router for shareable per-post URLs; (6) dark/light SCSS to match site; (7) test + `npm run deploy`. One gotcha: SPA direct-link/refresh 404 on GitHub Pages → easy fix via `HashRouter` (`rinnadia.com/#/posts/slug`). Offered to build it now.
