@@ -146,6 +146,10 @@
             display: block;
             padding-left: 0px;
             padding-right: 0px;
+            background-attachment: scroll;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
         }
 
         .about-section .content {
