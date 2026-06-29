@@ -17,7 +17,7 @@ function Footer() {
           <a href="mailto:rin.nadia.23@gmail.com" target="_blank" rel="noreferrer"><EmailIcon/></a>
           </h4>
       </div>
-      <div id="lower-footer"><h5> <a href="https://github.com/yujisatojr/react-portfolio-template" target="_blank" rel="noreferrer">Template by Yuji Sato</a></h5></div>
+      <div id="lower-footer"><h5> <a href="https://github.com/yujisatojr/react-portfolio-template" target="_blank" rel="noreferrer">Modified Version of a Template by Yuji Sato</a></h5></div>
     </footer>
   );
 }
