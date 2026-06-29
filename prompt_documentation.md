@@ -304,3 +304,153 @@ Called out the two CRA/static-host quirks (GitHub Pages routing, no runtime fold
 Key correction from the CRA version: **Vite removes the manual manifest step** — `import.meta.glob('../posts/*.md', { query: '?raw', import: 'default', eager: true })` auto-imports every `.md` file at build time, so no `index.json` to maintain and no runtime `fetch`. Posts live in `src/posts/` (not `public/`).
 
 Simplified 7-step plan: (1) `npm install react-router-dom react-markdown remark-gfm remark-math rehype-katex rehype-highlight`; (2) create `src/posts/*.md` with YAML front matter; (3) auto-discover with `import.meta.glob`; (4) build a list page + a post page (post page feeds Markdown to `react-markdown` for math + code); (5) router for shareable per-post URLs; (6) dark/light SCSS to match site; (7) test + `npm run deploy`. One gotcha: SPA direct-link/refresh 404 on GitHub Pages → easy fix via `HashRouter` (`rinnadia.com/#/posts/slug`). Offered to build it now.
+
+---
+
+## 2026-06-22
+
+**Prompt:** As I want to build markdown rendered posts in this project, remove everything related to rss - medium fetching.
+
+**Response:** Removed the entire Medium RSS integration in preparation for Markdown-rendered posts. Changes:
+
+1. **Deleted files** — `scripts/fetch-articles.js` (build-time RSS fetcher), `src/utils/articles.ts` (runtime rss2json refresh layer), and `src/config/medium.json` (Medium handle / maxArticles config). The now-empty `scripts/` and `src/config/` directories were removed.
+2. **`package.json`** — dropped the `fetch:articles` and `prebuild` npm scripts that ran the fetcher on every build.
+3. **`src/components/Articles.tsx`** — removed the `fetchLatestArticles` import and the `useEffect`/`useState` runtime-fetch logic; the component now renders directly from the static `src/data/articles.json`. Markup unchanged.
+4. **`src/data/articles.json`** — stripped the `generatedAt` and `source` (Medium feed URL) metadata fields left over from the fetch pipeline; kept the placeholder article entries as static data to be replaced by real posts.
+
+Verified: no dangling references to rss/medium/fetch in `src` or `package.json` (only remaining "medium" strings are placeholder article links in the sample data), `tsc` shows no errors related to the changed files, and both JSON files are valid. Note: a full `vite build` could not run in the sandbox due to a pre-existing platform mismatch in `node_modules` native binaries (rolldown), unrelated to these edits.
+
+---
+
+## 2026-06-22
+
+**Prompt:** I think I need a component that lists all md files inside public/posts and shows them in the Articles component. The Articles component should be expandable with pagination, search, and sorting by several criteria or tag. And I need a component that renders an MD file every time it is clicked. What do you think?
+
+**Response:** Confirmed the three-part design is the standard Markdown-blog architecture (list container + card + single-post renderer) and built a Markdown-powered blog into the existing Vite/React portfolio. Decisions: replace the Medium/static-articles content with local `public/posts` Markdown (user had no preference); include all four controls (search, sort, tag filter, pagination). Used a state-based inline view switch (no react-router) — clicking a card swaps the list for the rendered post with a back button — to avoid router surgery and GitHub Pages SPA 404s.
+
+Key technical note surfaced to user: the browser can't list a directory at runtime, so a build-time script generates a metadata manifest. Files added/changed:
+
+- `scripts/build-posts-index.js` — dependency-free Node script; scans `public/posts/*.md`, parses YAML-ish front matter (title, date, tags, excerpt, thumbnail, draft), derives slug + reading time + auto-excerpt, skips `draft: true`, and writes `public/posts/index.json` (metadata only, newest-first). Wired into npm `prestart` + `prebuild` via a new `build:posts` script.
+- `public/posts/*.md` — converted the old front-matter-less `test.md` into a `draft: true` placeholder (couldn't delete it — mount permission), and added three real sample posts with front matter: `ai-trust-vs-trustworthiness.md` (from the existing test content), `understanding-gradient-descent.md` (demonstrates KaTeX math + highlighted code), `welcome-to-my-blog.md`.
+- `public/posts/index.json` — generated manifest (3 published posts).
+- `src/types/post.ts` — `PostMeta`, `PostIndex`, `SortKey` types.
+- `src/utils/posts.ts` — `loadPostIndex()` (fetch `/posts/index.json`), `loadPostBody(slug)` (fetch `/posts/<slug>.md` + strip front matter), `formatDate`. Uses root-relative `/posts/...` URLs so it works in dev and at the custom domain root regardless of Vite `base`.
+- `src/components/Post.tsx` — fetches one post body by slug and renders it via `react-markdown` with `remark-gfm`, `remark-math` + `rehype-katex` (math), and `rehype-highlight` (code); shows title/date/tags + a back-to-list button.
+- `src/components/Articles.tsx` — rewritten as the list: loads the index, with search (title/excerpt/tags), sort (newest/oldest/title A–Z), clickable tag chips, and pagination (6/page); clicking a card opens `Post`. Reuses `Project.scss` grid + new `Articles.scss`.
+- `src/assets/styles/Articles.scss` — controls, tag chips, cards, pagination, and Markdown body typography, with `.light-mode` overrides matching the existing theme pattern.
+- `src/index.tsx` — import `katex/dist/katex.min.css` and `highlight.js/styles/github-dark.css`.
+- `package.json` — added deps `react-markdown`, `remark-gfm`, `remark-math`, `rehype-katex`, `rehype-highlight`, `katex`, `highlight.js`; added `build:posts`/`prestart`/`prebuild` scripts.
+
+To publish a post: drop a `.md` file with front matter in `public/posts/`, then `npm start`/`npm run build` (the prestart/prebuild hook regenerates the index). Verified: `build-posts-index.js` produces correct `index.json` (draft excluded); `tsc --noEmit` reports no errors in the new files (only the project's pre-existing untyped-`index.js` barrel and PNG-import errors, which Vite handles). A full `vite build` again could not complete in the sandbox (native bundler SIGBUS — the same pre-existing platform limitation noted above); user should run `npm install` (to pull the new deps) then `npm start` locally to see it live. Left the now-unused `src/data/articles.json` and `src/types/article.ts` in place (reversible; no longer imported).
+
+---
+
+## Prompt: how to make the background in main is resized when entering mobile version?
+
+**Response:** The hero background lives in `src/assets/styles/Main.scss` on `.about-section`, using `background-size: cover` + `background-attachment: fixed`. The `fixed` attachment is the culprit — mobile browsers (especially iOS Safari) handle it poorly, leaving the image zoomed-in and not scaled to the viewport. Fixed by adding background overrides inside the existing `@media (max-width:768px)` block's `.about-section` rule:
+
+```scss
+background-attachment: scroll;
+background-size: cover;
+background-position: center;
+min-height: 100vh;
+```
+
+Switching `fixed` → `scroll` lets the image scale to the viewport on mobile; `min-height: 100vh` keeps it
+
+---
+
+## 2026-06-28
+
+**Prompt:** Explain to me in detail about code in Navigation.tsx
+
+**Response:** Gave a detailed walkthrough of `src/components/Navigation.tsx` (the portfolio's top navigation bar). Covered:
+
+- **Imports & constants** — MUI `AppBar`/`Toolbar`/`Drawer`/`List` building blocks plus Dark/Light/Menu/List icons. `drawerWidth = 240` and `navItems` (a 2-D array pairing each label with its target: `expertise`, `professional-experience`, `articles`, `cv`).
+- **Props** — destructures `{mode}` from the loosely (`any`) typed `parentToChild`, plus the `modeChange` callback. These come from `App.tsx`, where `mode` is the string `'dark'`/`'light'` (so the `mode === 'dark'` check in the toggle is correct — the `-mode` suffix is only added when App builds the CSS class, not stored in state).
+- **State** — `mobileOpen` (drawer open/closed) and `scrolled` (whether the page has scrolled past the navbar height, used to add a `.scrolled` class for a styling change).
+- **Handlers** — `handleDrawerToggle` (flips drawer), a `useEffect` that attaches/cleans up a `window` scroll listener comparing `window.scrollY` to the navbar's `clientHeight`, `scrollToSection` (smooth `scrollIntoView` by element id, logs an error if missing), `openCv` (opens `/rinnadia-cv.pdf` in a new tab), and `handleNavClick` which routes the `cv` item to `openCv` and everything else to `scrollToSection`.
+- **Render** — a `drawer` JSX block for mobile (maps `navItems` to `ListItemButton`s) shown only via the temporary `Drawer` below the `sm` breakpoint; the `AppBar` with a hamburger `IconButton` (hidden ≥ `sm`), a desktop `Button` row (hidden < `sm`), and a theme-toggle icon that shows `LightModeIcon` in dark mode / `DarkModeIcon` in light mode, calling `modeChange()` on click.
+
+Also flagged minor notes: the `any`-typed props lose type safety, `navItems` tuples are accessed positionally, the theme toggle icons lack `IconButton`/aria wrappers, and `keepMounted` is set on the drawer for mobile SEO/perf.
+
+
+---
+
+## 2026-06-28
+
+**Prompt:** explain the logic in very simple language
+
+**Response:** Re-explained `src/components/Navigation.tsx` in plain, beginner-friendly language (follow-up to the previous detailed walkthrough). Key points framed simply:
+
+- It's the top menu bar (section links + day/night toggle).
+- One reusable list holds the four links (label + destination), shared by both desktop and mobile menus.
+- It tracks two on/off states: is the phone menu open, and has the user scrolled past the bar.
+- Clicking a link: "CV" opens the PDF in a new tab; every other link smooth-scrolls to that section.
+- A scroll listener flips a "scrolled" flag once you pass the bar's height (lets the bar restyle), and cleans itself up on unmount.
+- The theme button always shows the icon for the mode you'd switch *to* (sun in dark mode, moon in light mode) and asks the parent app to flip the theme rather than doing it itself.
+- Responsive behavior: wide screens show the buttons in a row; phones hide them behind a hamburger that opens a side drawer, which closes on any tap.
+
+
+---
+
+## 2026-06-28
+
+**Prompt:** can you visualize the explaination?
+
+**Response:** Rendered two inline SVG flowcharts (no files written) visualizing the plain-language Navigation.tsx logic:
+
+1. *Click logic* — Page loads → menu appears as a desktop button row OR a phone hamburger drawer → user clicks a menu item → decision "Is it the CV?" → yes: open the PDF in a new tab; otherwise: smooth-scroll to that section.
+2. *Background behaviors* — (a) scroll watcher: you scroll down → past the bar's height? → bar changes its look; (b) theme toggle: tap sun/moon → asks the main app → switches light or dark.
+
+
+---
+
+## 2026-06-28
+
+**Prompt:** I don't understand the part of "you scroll down, past the bar?, bar changes look", honestly speaking I don't find this action in the website.
+
+**Response:** Confirmed the user's observation is correct — that visual effect does NOT happen on the live site, so my earlier diagram oversold it. Grepped the project: the token `scrolled` appears ONLY in `src/components/Navigation.tsx` (the `scrolled` state + the `${scrolled ? ' scrolled' : ''}` className on the AppBar) and in NO stylesheet; `navbar-fixed-top` also appears only in the TSX. So the JS correctly toggles a `scrolled` class as you pass the navbar height, but there is no CSS rule targeting `.scrolled` (or `.navbar-fixed-top`), meaning nothing visible changes — a "wired-up switch connected to no bulb." Explained it's harmless dormant code, likely an intended shrink/shadow/background-on-scroll effect where the detection was added but the matching styles never were. Offered to implement a real effect (e.g. subtle shadow or solid background once scrolled past the top) if the user wants.
+
+
+---
+
+## 2026-06-28
+
+**Prompt:** what do you mean by the "bar"?
+
+**Response:** Clarified that "the bar" = the navigation bar (same as the earlier "menu bar"): the horizontal strip across the top of the site holding the nav links (Core Competencies, Professional Experience, Articles, CV) and the sun/moon theme toggle. In code it's the `AppBar` element with `id="navigation"`, fixed to the top as you scroll. Tied it back to the prior point: "the bar changes look" referred to that whole top strip restyling on scroll, which doesn't actually happen.
+
+---
+
+## 2026-06-28
+
+**Prompt:** TS7016: Could not find a declaration file for module ./components. E:/workspace/personal-github/personal-page/src/components/index.js implicitly has an any type. I found this error from webintelligence App.tsx, so what happened?
+
+**Response:** Diagnosed the root cause: `src/components/index.js` is a plain JavaScript file, but `tsconfig.json` has `strict: true` (which enables `noImplicitAny`) and no `allowJs: true`. Without `allowJs`, TypeScript can't type-check `.js` files — so when `App.tsx` imports from `./components`, TypeScript finds the barrel file but cannot process it, falling back to `any` and triggering TS7016. Fixed by renaming `src/components/index.js` → `src/components/index.ts` (the file only contains re-exports of `.tsx` components, so no content changes needed).
+
+---
+
+## 2026-06-28
+
+**Prompt:** Explain to me the function of "FadeIn" in App.tsx
+
+**Response:** `FadeIn` is a staggered entrance animation wrapper. It tracks a `maxIsVisible` counter (starts at 0) and increments it by 1 every `delay` ms (default 50ms) until it equals the number of children. Each child renders with `opacity: 0` and `translateY(20px)` until `maxIsVisible` passes its index — at which point it transitions to `opacity: 1` and no transform over `transitionDuration` ms.
+
+In `App.tsx`, it wraps four sections (`Main`, `Expertise`, `Timeline`, `Articles`) with a 700ms transition. The result: when the page loads, each section fades in and slides up sequentially with a 50ms stagger between them, rather than all appearing at once.
+
+The `visible` prop (not used in App.tsx) can reverse this — setting it to `false` decrements `maxIsVisible` back to 0, fading children out in reverse order.
+
+---
+
+## 2026-06-29
+
+**Prompt:** Pasted Vite dev server errors showing `Failed to resolve import "react-markdown"`, `"remark-gfm"`, `"remark-math"`, `"rehype-katex"` from `src/components/Post.tsx`. Asked "Are they installed?"
+
+**Response:** Checked `package.json` — none of the four packages were installed. Ran `npm install react-markdown remark-gfm remark-math rehype-katex` in the project directory. Confirmed all four packages resolved successfully. The dev server errors will be gone after restarting it.
+
+---
+
+**Prompt:** Do the packages need React 18?
+
+**Response:** Checked peer dependencies of all four packages. Only `react-markdown` requires React ≥ 18 (`"react": ">=18"`); `remark-gfm`, `remark-math`, and `rehype-katex` have no React peer dependency. The project already uses React 18, so there's no issue.
