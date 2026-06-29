@@ -7,7 +7,7 @@ import '../assets/styles/Articles.scss';
 
 const PAGE_SIZE = 6;
 
-function Articles() {
+function FullArticles() {
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
@@ -70,7 +70,6 @@ function Articles() {
   }, [posts, query, activeTag, sortKey]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const selectedPost = selectedSlug
@@ -85,13 +84,9 @@ function Articles() {
     );
   }
 
-  const showFullArticles = () => {
-    console.log("clicked!");
-  }
-
   return (
     <div className="projects-container" id="articles">
-      <h1 onClick={showFullArticles}>Articles</h1>
+      <h1>Articles</h1>
 
       {status === 'loading' && <p>Loading articles...</p>}
       {status === 'error' && <p>Articles could not be loaded right now.</p>}
@@ -205,4 +200,4 @@ function Articles() {
   );
 }
 
-export default Articles;
+export default FullArticles;

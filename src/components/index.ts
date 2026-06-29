@@ -7,3 +7,4 @@ export { default as Project } from "./Project";
 export { default as Contact } from "./Contact";
 export { default as Publication} from "./Publication";
 export { default as Articles} from "./Articles";
+export { default as FullArticles} from "./FullArticles";

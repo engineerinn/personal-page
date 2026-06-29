@@ -53,7 +53,7 @@ function Navigation({parentToChild, modeChange}: any) {
   const scrollToSection = (section: string) => {
     const targetElement = document.getElementById(section);
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth' });
+      targetElement.scrollIntoView({ behavior: 'smooth' }); //scrollIntoView is method from browser
     } else {
       console.error(`Element with id "${section}" not found`);
     }
