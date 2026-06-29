@@ -32,8 +32,6 @@
   },
   "scripts": {
     "start": "vite",
-    "fetch:articles": "node scripts/fetch-articles.js",
-    "prebuild": "npm run fetch:articles",
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
