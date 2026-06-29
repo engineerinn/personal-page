@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-06-29T02:54:34.174Z",
+  "count": 3,
+  "posts": [
+    {
+      "slug": "welcome-to-my-blog",
+      "title": "Welcome to My Blog",
+      "date": "2026-06-22",
+      "tags": [
+        "Meta"
+      ],
+      "excerpt": "A short note on why I'm writing here on my own site instead of a third-party platform — and what to expect.",
+      "thumbnail": null,
+      "readingTime": 1
+    },
+    {
+      "slug": "ai-trust-vs-trustworthiness",
+      "title": "AI Trust vs. AI Trustworthiness",
+      "date": "2026-06-20",
+      "tags": [
+        "AI",
+        "Trust",
+        "Security"
+      ],
+      "excerpt": "Why conflating how much users trust an AI with how trustworthy it actually is leads to over-trust and under-trust — and what standards say about it.",
+      "thumbnail": null,
+      "readingTime": 1
+    },
+    {
+      "slug": "understanding-gradient-descent",
+      "title": "Understanding Gradient Descent",
+      "date": "2026-06-12",
+      "tags": [
+        "Machine Learning",
+        "Optimization"
+      ],
+      "excerpt": "A quick, intuitive look at the workhorse optimization algorithm behind most of modern machine learning — with the core update rule and a tiny code example.",
+      "thumbnail": null,
+      "readingTime": 1
+    }
+  ]
+}

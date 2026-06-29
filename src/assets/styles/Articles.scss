@@ -1,0 +1,373 @@
+
+h1{
+    cursor: pointer;
+    text-decoration: none; /* no underline by default */
+}
+h1:hover{
+    text-decoration: underline;
+}
+
+/* ===================================================================
+   Articles / blog UI
+   Base styles target dark mode (the site's default); .light-mode
+   overrides follow the project's descendant-selector theming pattern.
+   =================================================================== */
+
+/* ---- List controls (search + sort) ---- */
+.articles-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 8px 0 16px;
+}
+
+.articles-search,
+.articles-sort {
+    font-size: 15px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    outline: none;
+}
+
+.articles-search {
+    flex: 1 1 240px;
+    min-width: 180px;
+    color: #ffffff;
+}
+
+.articles-search::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.articles-search:focus,
+.articles-sort:focus {
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+.articles-sort option {
+    color: #0d1116; /* native dropdown list stays readable */
+}
+
+/* ---- Tag filter chips ---- */
+.articles-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.tag-chip {
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: #B5B2B1;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.tag-chip:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+}
+
+.tag-chip.active {
+    background-color: #ffffff;
+    color: #0d1116;
+    border-color: #ffffff;
+}
+
+/* ---- Cards ---- */
+.article-card {
+    cursor: pointer;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.article-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.article-card h2 {
+    margin: 0 0 6px;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.card-tag {
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.85;
+    color: #ffffff;
+}
+
+/* ---- Pagination ---- */
+.articles-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 36px;
+}
+
+.articles-pagination button {
+    font-size: 14px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.articles-pagination button:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.articles-pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.page-indicator {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.articles-empty {
+    opacity: 0.7;
+    padding: 12px 0;
+}
+
+/* ===================================================================
+   Single post view
+   =================================================================== */
+.post-container {
+    width: 100%;
+}
+
+.post-back {
+    font-size: 14px;
+    padding: 6px 0;
+    margin-bottom: 16px;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.post-back:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.post-title {
+    margin: 0 0 6px;
+}
+
+.post-meta {
+    font-size: 14px;
+    opacity: 0.7;
+    margin: 0 0 12px;
+}
+
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 28px;
+}
+
+.post-tag {
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.post-status {
+    opacity: 0.7;
+}
+
+/* ---- Rendered Markdown body ---- */
+.post-body {
+    line-height: 1.7;
+    font-size: 16px;
+    max-width: 760px;
+}
+
+.post-body h1,
+.post-body h2,
+.post-body h3 {
+    line-height: 1.3;
+    margin: 1.6em 0 0.5em;
+}
+
+.post-body p {
+    margin: 0 0 1.1em;
+}
+
+.post-body a {
+    color: #6cb4ff;
+    text-decoration: underline;
+}
+
+.post-body ul,
+.post-body ol {
+    margin: 0 0 1.1em;
+    padding-left: 1.5em;
+}
+
+.post-body li {
+    margin-bottom: 0.4em;
+}
+
+.post-body blockquote {
+    margin: 0 0 1.1em;
+    padding: 4px 16px;
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    opacity: 0.9;
+}
+
+/* Inline code */
+.post-body code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.88em;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Code blocks (highlight.js theme paints the inner <code>) */
+.post-body pre {
+    margin: 0 0 1.2em;
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.post-body pre code {
+    display: block;
+    padding: 16px;
+    background: none; /* the hljs theme provides the block background */
+    font-size: 0.86em;
+    border-radius: 8px;
+}
+
+.post-body img {
+    max-width: 100%;
+    border-radius: 6px;
+}
+
+.post-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.2em;
+    font-size: 0.95em;
+}
+
+.post-body th,
+.post-body td {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 10px;
+    text-align: left;
+}
+
+/* Horizontal scroll for wide display-math instead of overflow */
+.post-body .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 0;
+}
+
+/* ===================================================================
+   Light-mode overrides
+   =================================================================== */
+.light-mode {
+    .articles-search,
+    .articles-sort {
+        border-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.04);
+        color: inherit;
+    }
+
+    .articles-search::placeholder {
+        color: rgba(0, 0, 0, 0.45);
+    }
+
+    .articles-search:focus,
+    .articles-sort:focus {
+        border-color: rgba(0, 0, 0, 0.55);
+    }
+
+    .tag-chip {
+        border-color: rgba(0, 0, 0, 0.25);
+        color: rgba(0, 0, 0, 0.45);;
+    }
+
+    .tag-chip:hover {
+        border-color: rgba(0, 0, 0, 0.6);
+        color: inherit;
+    }
+
+    .tag-chip.active {
+        background-color: #0d1116;
+        color: #ffffff;
+        border-color: #0d1116;
+    }
+
+    .article-card {
+        border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .article-card:hover {
+        border-color: rgba(0, 0, 0, 0.35);
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .card-tag,
+    .post-tag {
+        background-color: rgba(0, 0, 0, 0.08);
+        color: #575555;
+    }
+
+    .articles-pagination button {
+        border-color: rgba(0, 0, 0, 0.25);
+    }
+
+    .articles-pagination button:hover:not(:disabled) {
+        border-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .post-body a {
+        color: #0b66c2;
+    }
+
+    .post-body blockquote {
+        border-left-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .post-body code {
+        background-color: rgba(0, 0, 0, 0.07);
+    }
+
+    .post-body th,
+    .post-body td {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+}
