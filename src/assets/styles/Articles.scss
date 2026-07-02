@@ -12,6 +12,13 @@
     text-decoration: underline;
 }
 
+//Belong to Post.tsx
+#return-to-articles-button{
+    display: block;
+    margin-right: auto;
+    margin-left: 0;
+}
+
 /* ===================================================================
    Articles / blog UI
    Base styles target dark mode (the site's default); .light-mode
@@ -204,6 +211,7 @@
     padding: 3px 9px;
     border-radius: 999px;
     background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 }
 
 .post-status {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PostMeta, SortKey } from '../types/post';
-import { loadPostIndex, formatDate } from '../utils/posts';
+import { getPostIndex, formatDate } from '../utils/posts';
 import Post from './Post';
 import '../assets/styles/Project.scss';
 import '../assets/styles/Articles.scss';
@@ -20,7 +20,7 @@ function ArticlesList() {
 
   useEffect(() => {
     let cancelled = false;
-    loadPostIndex()
+    getPostIndex()
       .then((data) => {
         if (!cancelled) {
           setPosts(data);
@@ -89,8 +89,10 @@ function ArticlesList() {
 
   return (
     <div className="projects-container" id="articles-list">
-      <h1>Articles</h1>
-
+      <button className="post-back" type="button" id="return-to-articles-button">
+        ← Back to Articles
+      </button>
+      <h1>Articles List</h1>
       {status === 'loading' && <p>Loading articles...</p>}
       {status === 'error' && <p>Articles could not be loaded right now.</p>}
       {status === 'ready' && posts.length === 0 && <p>Coming soon...</p>}

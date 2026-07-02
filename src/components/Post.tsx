@@ -42,7 +42,7 @@ function Post({ post, onBack }: PostProps) {
 
   return (
     <div className="post-container">
-      <button className="post-back" onClick={onBack} type="button" id="return-button">
+      <button className="post-back" onClick={onBack} type="button">
         ← Back to articles
       </button>
 
