@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PostMeta, SortKey } from '../types/post';
-import { loadPostIndex, formatDate } from '../utils/posts';
+import { getPostIndex, formatDate } from '../utils/posts';
 import '../assets/styles/Project.scss';
 import '../assets/styles/Articles.scss';
 import {useNavigate} from "react-router";
@@ -14,7 +14,7 @@ function Articles() {
 
   useEffect(() => {
     let cancelled = false;
-    loadPostIndex()
+    getPostIndex()
       .then((data) => {
         if (!cancelled) {
           setPosts(data);

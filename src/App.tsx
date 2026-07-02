@@ -1,21 +1,9 @@
 import React, {useState, useEffect} from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router";
-import {
-  Main,
-  Timeline,
-  Expertise,
-  Project,
-  Contact,
-  Navigation,
-  Footer,
-  Publication,
-    Articles,
-    ArticlesList,
-    Post
-} from "./components";
+import { Main,  Timeline,  Expertise, Project, Contact,
+  Navigation, Footer, Articles, ArticlesList, Post} from "./components";
 import FadeIn from './components/FadeIn';
 import './index.scss';
-import post from "./components/Post";
 
 function App() {
     const [mode, setMode] = useState<string>('dark');
