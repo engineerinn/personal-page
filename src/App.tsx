@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router";
 import {
   Main,
   Timeline,
@@ -9,10 +10,12 @@ import {
   Footer,
   Publication,
     Articles,
-    FullArticles
+    ArticlesList,
+    Post
 } from "./components";
 import FadeIn from './components/FadeIn';
 import './index.scss';
+import post from "./components/Post";
 
 function App() {
     const [mode, setMode] = useState<string>('dark');
@@ -44,9 +47,14 @@ function App() {
     return (
     <div className={`main-container ${mode === 'dark' ? 'dark-mode' : 'light-mode'}`}>
 
-        {view === 'homeView' && <HomeView/>}
-        {view === 'fullArticleList' && <HomeView/>}
-        <Navigation parentToChild={{mode}} modeChange={handleModeChange}/>
+        <BrowserRouter>
+            <Navigation parentToChild={{mode}} modeChange={handleModeChange}/>
+            <Routes>
+                <Route path="/" element={<HomeView/>}/>
+                <Route path="/articles-list" element={<ArticlesList/>}/>
+
+            </Routes>
+        </BrowserRouter>
         <Footer />
     </div>
     );

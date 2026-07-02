@@ -42,7 +42,7 @@ function Post({ post, onBack }: PostProps) {
 
   return (
     <div className="post-container">
-      <button className="post-back" onClick={onBack} type="button">
+      <button className="post-back" onClick={onBack} type="button" id="return-button">
         ← Back to articles
       </button>
 
@@ -69,8 +69,7 @@ function Post({ post, onBack }: PostProps) {
           <div className="post-body">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeKatex, rehypeHighlight]}
-            >
+              rehypePlugins={[rehypeKatex, rehypeHighlight]}>
               {body}
             </ReactMarkdown>
           </div>

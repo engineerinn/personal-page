@@ -1,4 +1,5 @@
 import { PostIndex, PostMeta } from '../types/post';
+import {data} from "react-router";
 
 // Root-relative URLs work in dev (localhost) and in production at the site
 // root (rinnadia.com), avoiding any dependency on Vite's `base` setting.
@@ -14,6 +15,9 @@ export async function loadPostIndex(): Promise<PostMeta[]> {
     throw new Error(`Failed to load posts index (${res.status})`);
   }
   const data: PostIndex = await res.json();
+
+  console.log("Data from PostIndex", data);
+
   return data.posts ?? [];
 }
 
@@ -32,14 +36,14 @@ export function stripFrontMatter(raw: string): string {
  * post is opened, so large content isn't loaded up front.
  */
 export async function loadPostBody(slug: string): Promise<string> {
-  const res = await fetch(`${POSTS_BASE}/${encodeURIComponent(slug)}.md`, {
+  const fetchingResponse = await fetch(`${POSTS_BASE}/${encodeURIComponent(slug)}.md`, {
     cache: 'no-cache',
   });
-  if (!res.ok) {
-    throw new Error(`Failed to load post "${slug}" (${res.status})`);
+  if (!fetchingResponse.ok) {
+    throw new Error(`Failed to load post "${slug}" (${fetchingResponse.status})`);
   }
-  const raw = await res.text();
-  return stripFrontMatter(raw);
+  const rawData = await fetchingResponse.text();
+  return stripFrontMatter(rawData);
 }
 
 export function formatDate(isoDate: string): string {

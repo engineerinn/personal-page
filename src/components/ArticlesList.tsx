@@ -7,7 +7,7 @@ import '../assets/styles/Articles.scss';
 
 const PAGE_SIZE = 6;
 
-function FullArticles() {
+function ArticlesList() {
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
@@ -75,17 +75,20 @@ function FullArticles() {
   const selectedPost = selectedSlug
     ? posts.find((p) => p.slug === selectedSlug) ?? null
     : null;
+  console.log("selectedPost ->", selectedPost);
 
   if (selectedPost) {
+    console.log("selectedSlug --> ", selectedSlug);
+    console.log("selectedPost --> ", selectedPost);
     return (
-      <div className="projects-container" id="articles">
-        <Post post={selectedPost} onBack={() => setSelectedSlug(null)} />
+        <div className="projects-container" id="articles">
+          <Post post={selectedPost} onBack={() => setSelectedSlug(null)} />
       </div>
     );
   }
 
   return (
-    <div className="projects-container" id="articles">
+    <div className="projects-container" id="articles-list">
       <h1>Articles</h1>
 
       {status === 'loading' && <p>Loading articles...</p>}
@@ -99,9 +102,11 @@ function FullArticles() {
               className="articles-search"
               type="search"
               placeholder="Search articles..."
+
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search articles"
+
             />
             <select
               className="articles-sort"
@@ -153,8 +158,7 @@ function FullArticles() {
                       e.preventDefault();
                       setSelectedSlug(post.slug);
                     }
-                  }}
-                >
+                  }}>
                   {post.thumbnail && (
                     <img src={post.thumbnail} className="zoom" alt={post.title} width="100%" />
                   )}
@@ -200,4 +204,4 @@ function FullArticles() {
   );
 }
 
-export default FullArticles;
+export default ArticlesList;

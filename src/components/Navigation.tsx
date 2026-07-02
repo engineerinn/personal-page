@@ -15,17 +15,16 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
+import {useNavigate} from "react-router";
 
 const drawerWidth = 240;
 const navItems = [['Core Competencies', 'expertise'],
- ['Professional Experience', 'professional-experience'],
-    ['Articles', 'articles'],
-  ['CV', 'cv']];
+ ['Professional Experience', 'professional-experience'], ['Articles', 'articles'], ['CV', 'cv']];
 
 function Navigation({parentToChild, modeChange}: any) {
 
   const {mode} = parentToChild;
-
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
 
@@ -68,7 +67,11 @@ function Navigation({parentToChild, modeChange}: any) {
       openCv();
       return;
     }
-    scrollToSection(target);
+      if (location.pathname === '/') {
+          scrollToSection(target);                          // already home — element exists
+      } else {
+          navigate('/', { state: { scrollTo: target } });   // go home, carry the target along
+      }
   };
 
 const drawer = (
@@ -104,7 +107,7 @@ const drawer = (
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {navItems.map((item) => (
               <Button key={item[0]} onClick={() => handleNavClick(item[1])} sx={{ color: '#fff' }}>
-                {item[0]}
+                  {item[0]}
               </Button>
             ))}
           </Box>
