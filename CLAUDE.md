@@ -5,31 +5,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm start          # Dev server on localhost:3000
-npm run build      # Production build to /build
-npm run test       # Jest tests (watch mode)
-npm run deploy     # Build + deploy to GitHub Pages
+npm start            # Dev server (Vite, http://localhost:5173)
+npm run build        # Production build to /dist
+npm run preview      # Preview the production build locally
+npm run deploy       # Build + deploy to GitHub Pages (dist/ via gh-pages)
 ```
+
+`src/App.test.tsx` exists but there is no `test` script and no Jest/Vitest configured — tests are not currently runnable.
 
 ## Stack
 
-- React 18 + TypeScript (strict, ES5 target) via Create React App (react-scripts)
+- React 19 + TypeScript (strict, ES2020 target, ESNext modules) via Vite (`@vitejs/plugin-react`)
+- `react-router` v8 (`BrowserRouter`/`Routes`/`Route`) for client-side routing
 - SCSS for all styling — component SCSS files live in `src/assets/styles/`
-- MUI 5 for UI components (AppBar, Drawer, TextField, Chip) — **not** wrapped in MUI ThemeProvider
+- MUI 9 for UI components (AppBar, Drawer, TextField, Chip) — **not** wrapped in MUI ThemeProvider
 - FontAwesome for icons, `react-vertical-timeline-component` for the experience section
+- `react-markdown` + `remark-gfm`/`remark-math`/`rehype-highlight`/`rehype-katex` for rendering blog posts from `public/posts/`
 - `gh-pages` for deployment
 
 ## Architecture
 
-Single-page portfolio app with no router. Navigation uses `scrollIntoView` targeting section IDs (`expertise`, `professional-experience`, `projects`, `publication`, `contact`).
+Portfolio app with client-side routing via `react-router` (`BrowserRouter` in `App.tsx`). Two routes: `/` (home — `Main`, `Expertise`, `Timeline`, `Articles`, wrapped in `FadeIn`) and `/articles-list` (`ArticlesList`). Within the home view, section navigation still uses `scrollIntoView` targeting section IDs (`expertise`, `professional-experience`, `projects`, `publication`, `contact`).
 
-**Theme:** `App.tsx` holds `mode` state (`"dark-mode"` | `"light-mode"`), applied as a CSS class on `.main-container`. Both themes are defined in `src/index.scss` using descendant selectors — MUI components are styled via inline `sx` props, not ThemeProvider.
+**Blog/articles:** `public/posts/` holds Markdown files plus an `index.json` manifest; `Articles`, `ArticlesList`, and `Post` components render them via `react-markdown`.
+
+**Theme:** `App.tsx` holds `mode` state (`"dark"` | `"light"`), and derives the `dark-mode`/`light-mode` class applied to `.main-container`. Both themes are defined in `src/index.scss` using descendant selectors — MUI components are styled via inline `sx` props, not ThemeProvider.
 
 **Props:** Navigation receives `parentToChild` (containing `mode`) and `modeChange` callback as `any` typed props — old prop-drilling pattern, no Context.
 
-**FadeIn wrapper** (`src/components/FadeIn.tsx`): Staggered entrance animation using `maxIsVisible` state counter. Wraps all page sections in `App.tsx`.
+**FadeIn wrapper** (`src/components/FadeIn.tsx`): Staggered entrance animation using `maxIsVisible` state counter. Wraps page sections.
 
-**Barrel export:** All components are re-exported from `src/components/index.js`.
+**Barrel export:** All components are re-exported from `src/components/index.ts`.
 
 ## Key Patterns
 

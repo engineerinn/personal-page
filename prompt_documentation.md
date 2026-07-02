@@ -454,3 +454,89 @@ The `visible` prop (not used in App.tsx) can reverse this — setting it to `fal
 **Prompt:** Do the packages need React 18?
 
 **Response:** Checked peer dependencies of all four packages. Only `react-markdown` requires React ≥ 18 (`"react": ">=18"`); `remark-gfm`, `remark-math`, and `rehype-katex` have no React peer dependency. The project already uses React 18, so there's no issue.
+
+---
+
+**Prompt:** Explain to me the logic of code workflow in Articles.tsx
+
+**Response:** Walked through `Articles.tsx` as a self-contained list-and-detail view. **Data loading:** first `useEffect` calls `loadPostIndex()` → fetches `/posts/index.json` (metadata only) into `posts`, moving `status` `loading → ready`/`error`; a `cancelled` cleanup flag guards against post-unmount state updates. Highlighted the two-tier design — metadata loads up front, each post's Markdown body is fetched lazily by `Post.tsx` on open. **UI state:** `query`, `sortKey`, `activeTag`, `page`, plus `selectedSlug`; a second `useEffect` resets `page` to 1 when query/sort/tag change so filtering can't strand you on an empty page. **Derived (useMemo):** `allTags` (unique sorted tag set), `filtered` (tag filter → case-insensitive search over title+excerpt+tags → sort by `sortKey`), then `totalPages`/`pageItems` slicing. **Render branching:** if `selectedPost` exists, early-returns `<Post>` (loads body by slug, renders Markdown with GFM + KaTeX + syntax highlighting, `onBack` clears `selectedSlug`); otherwise renders header, status message, controls, tag chips, card grid (or empty message), and pagination. **Interaction loop:** clicking/Enter/Space on a card sets `selectedSlug` → detail branch; back returns to the list with state preserved (state lives above the branch). **Loose end flagged:** the "Article List" header (line 96) calls `showFullArticles`, which only does `console.log("clicked!")` — `ArticlesList.tsx` exists but isn't imported/routed here, so the header does nothing user-visible.
+
+---
+
+## 2026-06-30
+
+**Prompt:** explain to me every hook used in articles.tsx
+
+**Response:** Explained all hooks in `src/components/Articles.tsx`:
+
+- **`useNavigate`** (line 13, React Router) — returns a `navigate` function used in `showFullArticles` to redirect to `/articles-list`.
+- **`useState` × 6** (lines 14–21) — `posts` (loaded PostMeta array), `status` (`'loading'`/`'ready'`/`'error'`), `query` (search string, currently unconnected to any `<input>`), `sortKey` (sort enum, declared but the sort always does date-descending regardless), `activeTag` (selected tag filter or `null`), `page` (current pagination page), `selectedSlug` (slug of a clicked card; when set, shows the `<Post>` detail view instead of the grid).
+- **`useEffect` #1** (lines 23–38, dependency `[]`) — runs once on mount; calls `loadPostIndex()`, sets `posts` + flips `status` to `'ready'`/`'error'`. Uses a `cancelled` flag in cleanup to skip state updates if the component unmounts before the promise resolves.
+- **`useEffect` #2** (lines 40–42, deps `[query, sortKey, activeTag]`) — resets `page` to 1 whenever a filter changes, so narrowing a search can't strand the user on a now-empty page.
+- **`useMemo`** (lines 45–60, deps `[posts, query, activeTag, sortKey]`) — recomputes the filtered+sorted post list only when its inputs change. Filters by active tag, then by case-insensitive search over title+excerpt+tags, then sorts by date descending. Result drives `totalPages` and `pageItems` via plain derived calculations (no hooks needed for those).
+
+---
+
+**Prompt:** when is "const filtered" first invoked?
+
+**Response:** On the initial render of `Articles`. `useMemo` runs synchronously during the render that first mounts the component, so `filtered` is computed immediately — before any `useEffect` fires. At that point `posts` is still `[]`, so `filtered` returns `[]`. After the first render, `useEffect #1` fires, fetches post data, calls `setPosts(data)`, triggering a re-render where `useMemo` recomputes `filtered` with real data and cards appear. Sequence: (1) first render → `filtered = []`; (2) `useEffect #1` resolves → `setPosts` + `setStatus('ready')`; (3) re-render → `filtered` recomputes with real posts.
+
+---
+
+**Prompt:** can I use useMemo without dependencies?
+
+**Response:** Yes, but it's pointless. Empty array `[]` runs once on mount and never again — same as a constant. Omitting the array entirely recomputes on every render, defeating the purpose of memoization (you'd just write the expression inline). In practice, `useMemo` without meaningful dependencies is either a bug or dead weight; the array should list every component-scope value the computation reads.
+
+---
+
+## 2026-06-30
+
+**Prompt:** What is the function of `const sorted = [...matched].sort((a, b) => { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }); return sorted; }, [posts, query, activeTag, sortKey]);` in Articles.tsx?
+
+**Response:** This is the tail end of the `useMemo` hook's return block. Breakdown: `[...matched]` creates a shallow copy of the already-filtered posts array so the original isn't mutated. `.sort((a, b) => ...)` sorts that copy by date descending (newest first) — when `a` is older than `b` it returns `1` (push `a` later); when `a` is newer it returns `-1` (pull `a` earlier). `return sorted` gives the final sorted array as the useMemo's output (stored in `filtered`). `}, [posts, query, activeTag, sortKey])` closes the useMemo — the dependency array means the computation only re-runs when any of those four values change. Also flagged that the file appears to be missing the opening of the `useMemo` and the `matched`/`query`/`activeTag`/`sortKey` variable declarations between lines 34 and 36 — this would cause a compile error.
+
+---
+
+**Prompt:** Why does `const sorted = [...matched].sort((a, b) => { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }` return `PostMeta[]`? When does something pass `PostMeta[]` to `const sorted`?
+
+**Response:** The data flow is: `useState<PostMeta[]>([])` types `posts` as `PostMeta[]`. On mount, `useEffect` calls `loadPostIndex()` which resolves to `PostMeta[]`, and `setPosts(data)` stores it. Inside the `useMemo`, `posts.filter(...)` preserves the element type, so `matched` is already `PostMeta[]`. Spreading it into `[...matched]` produces another `PostMeta[]`, and `.sort()` returns the same type — TypeScript infers all of this automatically. The spread is needed because `.sort()` mutates in place; the copy protects the original `matched` array.
+
+---
+
+## 2026-06-30
+
+**Prompt:** Showed a browser console screenshot with `console.log("New New New!")` in `Articles.tsx` logging twice during initial refresh. Asked why.
+
+**Response:** Caused by `<React.StrictMode>` wrapping the app in `src/index.tsx` (line 11). In development mode, StrictMode intentionally double-invokes render functions to surface side effects — so any `console.log` at the top level of a component fires twice. This only happens in dev (`npm start`); production builds (`npm run build`) do not double-invoke. Leaving StrictMode in place is recommended as it exists to catch bugs.
+
+---
+
+## 2026-07-02
+
+**Prompt:** Analyze Article.scss! I found the button whose class is post-back in Posts.tsx — the font colour is white, but why when I switch the web into the light version does it automatically become black?
+
+**Response:** It's a CSS specificity issue in `index.scss`, not anything in `Post.tsx`. Three rules target the button: (1) `Articles.scss` → `.post-back { color: #ffffff }`, specificity (0,1,0); (2) `index.scss` → the global `p, a, … button { color: white }`, specificity (0,0,1); (3) `index.scss` → `.light-mode { … button { color: #0d1116 } }`, which compiles to `.light-mode button`, specificity (0,1,1). In dark mode, `.post-back` (0,1,0) beats the plain `button` rule (0,0,1) so white wins — but the global default is already white, so no visible difference. In light mode, `.light-mode button` (0,1,1) is one notch more specific than the single-class `.post-back` (0,1,0), because the `button` type selector added to the `.light-mode` class tips it over. So it overrides the white with `#0d1116` (the site-wide near-black used for text in light mode). No light-mode rule was ever written for `.post-back`; the generic theme rule catches it along with every other button/p/a/heading. The `id="return-button"` has no matching CSS rule, so it doesn't factor in. Note the black is actually the desirable result — white on the `#f8f9fa` light background would be near-invisible. To force white anyway, beat (0,1,1) with e.g. `.light-mode .post-back { color: #fff }` or `#return-button { color: #fff }`.
+
+---
+
+**Prompt:** In ArticleList.tsx, Post.tsx is invoked, but I don't see any function passed as `onBack` — it keeps `void`. Then why does the back button work?
+
+**Response:** `() => void` in `Post.tsx` (line 12) is a *type annotation*, not a value. It declares the shape `onBack` must have — a function taking no arguments and returning nothing (`void`) — and does not mean an empty/no-op function is supplied. The real function is passed by the parent at the call site: `ArticlesList.tsx` line 82, `<Post post={selectedPost} onBack={() => setSelectedSlug(null)} />`. So `onBack` is `() => setSelectedSlug(null)`. Clicking the button (`Post.tsx` line 45, `onClick={onBack}`) runs it → `setSelectedSlug(null)` → `selectedPost` recomputes to `null` (ArticlesList lines 75–77) → the `if (selectedPost)` early return (line 79) is skipped → the list view re-renders. Also noted the file is `ArticlesList.tsx` (with an "s"), and that the sibling `Articles.tsx` never renders `<Post>` at all — its card clicks set `selectedSlug` but nothing consumes it, a likely source of the "no function passed" impression.
+
+---
+
+**Prompt:** In which file does the initial bundle/render load in this project — is it `index.tsx`?
+
+**Response:** Confirmed `src/index.tsx` is the entry point: it mounts React into the `#root` div, renders `App`, and imports `index.scss` — global styles and the app tree both load there first.
+
+---
+
+**Prompt:** Give me an example for that.
+
+**Response:** Walked through the actual load chain: root `index.html` has `<div id="root">` and `<script type="module" src="/src/index.tsx">`; that script runs `index.tsx`, which imports `index.scss` and `App` and mounts them via `ReactDOM.createRoot(...).render(<App />)`. Also flagged that `package.json` shows the project runs on Vite (`vite`, `vite build` scripts, `@vitejs/plugin-react` dependency), not Create React App/react-scripts as `CLAUDE.md` stated — which is why `index.html` lives at the repo root with a `type="module"` script pointing at `/src/index.tsx`, rather than CRA's setup under `public/`.
+
+---
+
+**Prompt:** Yes, update it (referring to `CLAUDE.md`, to reflect the Vite migration).
+
+**Response:** Audited the live codebase against `CLAUDE.md` and found it stale in more places than just the build tool: React 18 → actually 19.2.7; MUI 5 → actually 9.x; TS target ES5 → actually ES2020 with ESNext modules; "no router" → `App.tsx` now uses `react-router` v8 (`BrowserRouter`/`Routes`/`Route`) with two routes, `/` and `/articles-list`, backing a new Markdown-based Articles/blog feature that reads from `public/posts/` (via `react-markdown` + remark/rehype plugins); `npm run test` → no `test` script or Jest/Vitest config exists even though `src/App.test.tsx` is still present; the barrel export file is `index.ts`, not `index.js`; and the `mode` state values are literally `'dark'`/`'light'`, with `dark-mode`/`light-mode` only appearing as the derived class name. Rewrote the Commands, Stack, and Architecture sections of `CLAUDE.md` to match current reality; left Key Patterns as-is since those claims were re-verified true (EmailJS still commented out in `Contact.tsx`, `Expertise`/`Publication` still structurally duplicated, breakpoints still 768px/567px).
