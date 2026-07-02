@@ -18,7 +18,7 @@ import Toolbar from '@mui/material/Toolbar';
 import {useNavigate} from "react-router";
 
 const drawerWidth = 240;
-const navItems = [['Home', 'home-view'], ['Core Competencies', 'expertise'],
+const navItems = [['Core Competencies', 'expertise'],
  ['Professional Experience', 'professional-experience'], ['Articles', 'articles'], ['CV', 'cv']];
 
 function Navigation({parentToChild, modeChange}: any) {
@@ -70,8 +70,7 @@ function Navigation({parentToChild, modeChange}: any) {
       if (location.pathname === '/') {
           scrollToSection(target);                          // already home — element exists
       } else {
-        navigate('/');
-        setTimeout(() => scrollToSection(target), 100);
+          navigate('/', { state: { scrollTo: target } });   // go home, carry the target along
       }
   };
 

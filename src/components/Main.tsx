@@ -9,7 +9,9 @@ import '../assets/styles/Main.scss';
 function Main() {
 
   return (
-    <div className="container">
+
+
+    <div className="container" id="home-view">
       <div className="about-section">
         {/* Below is the image photo */}
         {/*  <div className="image-wrapper">
