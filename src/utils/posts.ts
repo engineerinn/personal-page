@@ -63,7 +63,7 @@ export function stripFrontMatter(raw: string): string {
  */
 export async function loadPostBody(slug: string): Promise<string> {
   const fetchingResponse = await fetch(`${POSTS_BASE}/${encodeURIComponent(slug)}.md`, {
-    cache: 'default',
+    cache: 'no-cache',
   });
   if (!fetchingResponse.ok) {
     throw new Error(`Failed to load post "${slug}" (${fetchingResponse.status})`);
