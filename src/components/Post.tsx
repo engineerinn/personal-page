@@ -5,77 +5,84 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import { PostMeta } from '../types/post';
-import { loadPostBody, formatDate } from '../utils/posts';
-
-interface PostProps {
-  post: PostMeta;
-  onBack: () => void;
-}
+import { useLocation, useParams } from 'react-router';
+import { loadPostBody, getPostData, formatDate } from '../utils/posts';
+import {useNavigate} from "react-router";
 
 /**
  * Renders a single post's Markdown body (fetched by slug) with GitHub-flavored
  * Markdown, LaTeX math (KaTeX), and syntax-highlighted code blocks.
  */
-function Post({ post, onBack }: PostProps) {
+function Post() {
+  const { slug } = useParams();
+  const location = useLocation();
+  const statePost = (location.state as { post?: PostMeta } | null)?.post ?? null;
+  const navigate = useNavigate();
+
+  const [post, setPost] = useState<PostMeta | null>(statePost);
   const [body, setBody] = useState<string>('');
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => {
-    let cancelled = false;
-    setStatus('loading');
-    loadPostBody(post.slug)
-      .then((text) => {
-        if (!cancelled) {
-          setBody(text);
-          setStatus('ready');
-        }
+    if (!slug) {
+      setStatus('error');
+      return;
+    }
+    // Only refetch metadata if we didn't get it via navigation state
+    const metaPromise = post ? Promise.resolve(post) : getPostData(slug);
+
+    metaPromise
+      .then((data) => {
+        if (!data) throw new Error('not found');
+        setPost(data);
+        return loadPostBody(slug);
       })
-      .catch(() => {
-        if (!cancelled) setStatus('error');
-      });
-    // Jump to top when opening a post.
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return () => {
-      cancelled = true;
-    };
-  }, [post.slug]);
+      .then((text) => {
+        setBody(text);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
+  }, [slug]);
+
+  if (status === 'loading' && !post) {
+    return <p className="post-status">Loading…</p>;
+  }
+
 
   return (
-    <div className="post-container">
-      <button className="post-back" onClick={onBack} type="button">
-        ← Back to articles
-      </button>
-
+      <div className="projects-container" id="articles">
+      <div className="post-container">
+      <button className="post-back" type="button" onClick={ ()=> navigate(-1)}>
+          ← Back to Articles List</button>
       <article className="post">
-        <h1 className="post-title">{post.title}</h1>
-        <p className="post-meta">
-          {formatDate(post.date)} · {post.readingTime} min read
-        </p>
-        {post.tags.length > 0 && (
-          <div className="post-tags">
-            {post.tags.map((tag) => (
-              <span className="post-tag" key={tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
+        {status === 'loading' && <p>Loading Article...</p>}
+        {status === 'error' && <p className="post-status">Sorry, this post could not be loaded.</p>}
+          {status === 'ready' && post && (
+              <>
+                  <h1 className="post-title">{post.title}</h1>
+                  <p className="post-meta">
+                      {formatDate(post.date)} · {post.readingTime} min read
+                  </p>
 
-        {status === 'loading' && <p className="post-status">Loading…</p>}
-        {status === 'error' && (
-          <p className="post-status">Sorry, this post could not be loaded.</p>
-        )}
-        {status === 'ready' && (
-          <div className="post-body">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeKatex, rehypeHighlight]}>
-              {body}
-            </ReactMarkdown>
-          </div>
+                  {post.tags.length > 0 && (
+                      <div className="post-tags">
+                          {post.tags.map((tag) => (
+                              <span className="post-tag" key={tag}>{tag}</span>
+                          ))}
+                      </div>
+                  )}
+
+                  <div className="post-body">
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeHighlight]}>
+                          {body}
+                      </ReactMarkdown>
+                  </div>
+              </>
+
         )}
       </article>
     </div>
+          </div>
   );
 }
 

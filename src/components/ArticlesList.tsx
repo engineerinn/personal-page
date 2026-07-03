@@ -1,22 +1,31 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PostMeta, SortKey } from '../types/post';
 import { getPostIndex, formatDate } from '../utils/posts';
-import Post from './Post';
 import '../assets/styles/Project.scss';
 import '../assets/styles/Articles.scss';
+import {useNavigate} from "react-router";
 
 const PAGE_SIZE = 6;
 
 function ArticlesList() {
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('date-desc');
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const goToPost = (slug: string) => {
+    const selectedPost = slug
+        ? posts.find((p) => p.slug === slug) ?? null
+        : null;
+    navigate('/articles-list/' + slug, { state: {post: selectedPost} });
+  };
+
+  const backToPrevPage = () =>{
+    navigate(-1);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -72,24 +81,12 @@ function ArticlesList() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const selectedPost = selectedSlug
-    ? posts.find((p) => p.slug === selectedSlug) ?? null
-    : null;
-  console.log("selectedPost ->", selectedPost);
-
-  if (selectedPost) {
-    console.log("selectedSlug --> ", selectedSlug);
-    console.log("selectedPost --> ", selectedPost);
-    return (
-        <div className="projects-container" id="articles">
-          <Post post={selectedPost} onBack={() => setSelectedSlug(null)} />
-      </div>
-    );
-  }
-
   return (
     <div className="projects-container" id="articles-list">
-      <button className="post-back" type="button" id="return-to-articles-button">
+      <button className="post-back"
+              type="button"
+              onClick={ ()=> navigate(-1)}
+              id="return-to-articles-button">
         ← Back to Articles
       </button>
       <h1>Articles List</h1>
@@ -152,13 +149,13 @@ function ArticlesList() {
                 <div
                   className="project article-card"
                   key={post.slug}
-                  onClick={() => setSelectedSlug(post.slug)}
+                  onClick={() => goToPost(post.slug)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setSelectedSlug(post.slug);
+                      goToPost(post.slug);
                     }
                   }}>
                   {post.thumbnail && (

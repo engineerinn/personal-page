@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PostMeta, SortKey } from '../types/post';
-import { getPostIndex, formatDate } from '../utils/posts';
+import {getPostIndex, formatDate, getPostData} from '../utils/posts';
 import '../assets/styles/Project.scss';
 import '../assets/styles/Articles.scss';
 import {useNavigate} from "react-router";
@@ -9,7 +9,6 @@ function Articles() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [page, setPage] = useState(1);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +38,16 @@ function Articles() {
 
   const showFullArticles = () => {
     navigate('/articles-list', { state: {} });
+  }
+
+  const selectedPost = selectedSlug
+      ? posts.find((p) => p.slug === selectedSlug) ?? null
+      : null;
+
+  if (selectedPost) {
+    var targetLink = '/articles-list/' + selectedSlug;
+    setSelectedSlug(null);
+    navigate(targetLink, { state: {post: selectedPost} });
   }
 
   return (
