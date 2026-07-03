@@ -40,7 +40,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomeView/>}/>
                 <Route path="/articles-list" element={<ArticlesList/>}/>
-
+                <Route path="/articles-list/:slug" element={<Post/>}/>
             </Routes>
         </BrowserRouter>
         <Footer />
