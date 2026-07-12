@@ -98,6 +98,37 @@ p, a, h1, h2, h3, h4, h5, label, button {
   justify-content: center;
 }
 
+/* Syntax-highlight token colors for Markdown code blocks — dark mode only */
+.dark-mode {
+  .post-body code {
+    color: #e6edf3; /* base code color so non-token text is visible on #0d1116 */
+  }
+
+  .post-body pre {
+    background-color: #300a24; /* Ubuntu terminal aubergine */
+  }
+
+  .hljs-keyword {
+    color: #ff7b72;
+  }
+
+  .hljs-string {
+    color: #a5d6ff;
+  }
+
+  .hljs-comment {
+    color: #8b949e;
+  }
+
+  .hljs-number {
+    color: #79c0ff;
+  }
+
+  .katex-display {
+    color: #ffffff;
+  }
+}
+
 .light-mode {
   background-color: #f8f9fa;
 
