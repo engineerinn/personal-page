@@ -20,5 +20,5 @@ function spaGithubPagesFallback(): Plugin {
 
 export default defineConfig({
     plugins: [react(), spaGithubPagesFallback()],
-    base: 'https://rinnadia.com',  // matches your homepage
+    base: 'https://rinnadia.uk',  // matches your homepage
 })

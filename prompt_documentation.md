@@ -664,3 +664,95 @@ Verified: `tsc --noEmit` shows no errors in `Post.tsx` or `ArticlesList.tsx` (re
 **Prompt:** apply this patch to post.tsx
 
 **Response:** Applied the rewrite to `src/components/Post.tsx`: removed the dead commented-out `PostProps` interface/signature; `post` is now local state (`useState<PostMeta | null>(statePost)`) seeded from `location.state`; the effect fetches `getPostData(slug)` only when `post` is falsy (i.e., not supplied via navigation state), then always loads the body via `loadPostBody(slug)`; added an early `if (status === 'loading' && !post) return <p>Loading…</p>;` guard and wrapped the title render in `{post && <h1>...</h1>}` to eliminate the null-dereference crash and the "possibly null" TS warning.
+
+## 2026-07-12
+
+**Prompt:** Inside Post.tsx the libraries to render the MD files contents are invoked, while in understanding gradient descent.md there is a python code block (```python) and in dark mode it's barely visible because the font colour is black. How can I set the colour of programming script on MD files rendering in the project? Don't modify code without my command, for now just tell me how to do that.
+
+**Response:** Diagnosed the issue without modifying code. Cause: `rehype-highlight` only adds `hljs-*` classes to token spans — it ships no CSS, and no highlight.js theme stylesheet is imported anywhere in the project. Additionally, `index.scss` applies `color: white` only to `p, a, h1–h5, label, button` (not `pre`/`code`/`span`), and `.post-body code` rules in `Articles.scss` set backgrounds but no `color`, so code text falls back to the browser default black — invisible on the `#0d1116` dark background. Proposed three options: (A) import a highlight.js theme (e.g. `import 'highlight.js/styles/github-dark.css'` in Post.tsx; add `highlight.js` as a direct dependency since it's currently only transitive via lowlight); (B) define own `.hljs-*` color rules in Articles.scss scoped under `.dark-mode`/`.light-mode`, matching the project's descendant-selector theming pattern; (C) minimal fix — set a `color` on `.post-body pre code` per mode without syntax colors. Also flagged that `.post-body code { background-color: rgba(255,255,255,0.1) }` and `.post-body pre code { background: none }` out-specific the theme's `.hljs` background and would need adjusting (scope inline rule to `:not(pre) > code`) if a theme is imported.
+
+## 2026-07-12
+
+**Prompt:** Is there any best practice to create this website to be multilingual? (Current language is English, I'm planning to add Korean and German)
+
+**Response:** Advisory only (no code changes). Recommended react-i18next + i18next-browser-languagedetector as the standard setup for this Vite/React SPA: JSON resource bundles per locale at `src/i18n/locales/{en,ko,de}.json` with semantic keys (e.g. `nav.expertise`), bundled directly (no lazy loading needed at this size), initialized once in `main.tsx`, consumed via `useTranslation()`; add an `i18next.d.ts` module augmentation for typed translation keys given the strict TS config. Detection order localStorage → browser language with fallback `en`; sync `document.documentElement.lang` on change. Language switcher in `Navigation` beside the theme toggle, labeled with endonyms (English / 한국어 / Deutsch) rather than flags. Blog content handled separately from UI strings: restructure `public/posts/` into per-locale subfolders (`posts/en/…`, `posts/ko/…`, `posts/de/…`) with per-locale manifests (or a `lang` field), falling back to English when a translation is missing. Layout/typography cautions: German runs ~30% longer (avoid fixed widths in nav/buttons/timeline cards); Korean needs a Hangul-covering font (Noto Sans KR or Pretendard) plus `word-break: keep-all`; format Timeline dates with `Intl.DateTimeFormat(locale)` instead of hardcoded strings. Noted path-prefix URLs (`/ko/…`) + hreflang are the SEO-proper practice but of limited value on a client-rendered GitHub Pages SPA — a switcher + localStorage (optionally shareable `?lng=` links, which the detector reads) is the pragmatic choice.
+
+---
+
+## 2026-07-12
+
+**Prompt:** Add the colour font for `.hljs-keyword`, `.hljs-string`, `.hljs-comment`, `.hljs-number` in index style, I don't want to add more scss or css script. Make it distinguish in dark mode and don't touch anything in light mode.
+
+**Response:** Added a `.dark-mode`-scoped block to `src/index.scss` (before the `.light-mode` block) with GitHub-Dark-style token colors: `.hljs-keyword` #ff7b72, `.hljs-string` #a5d6ff, `.hljs-comment` #8b949e, `.hljs-number` #79c0ff. Also included one extra rule, `.dark-mode .post-body code { color: #e6edf3 }`, as a base code color — without it, all non-token code text (variables, function names, operators) would remain browser-default black and stay invisible on `#0d1116`. Everything is scoped under `.dark-mode` (verified App.tsx applies that class to `.main-container`, which wraps the Post route), so light mode is untouched. No new files added.
+
+## 2026-07-12
+
+**Prompt:** List me files that you modified for the previous task!
+
+**Response:** Listed the two modified files: `src/index.scss` (added the `.dark-mode`-scoped hljs token colors + base code color) and `prompt_documentation.md` (documentation entry, per project instructions).
+
+## 2026-07-12
+
+**Prompt:** I need the character display in `<span class="katex-display">` to be white under dark mode. Do it!
+
+**Response:** Added `.katex-display { color: #ffffff }` inside the existing `.dark-mode` block in `src/index.scss`. KaTeX doesn't set its own text color, so descendants inherit the white. Light mode untouched. Noted that inline math (`.katex` outside `.katex-display`) still inherits the default color and can be extended the same way if needed.
+
+## 2026-07-12
+
+**Prompt:** I want `<pre>` or class "hljs" background colour to be like the Ubuntu desktop terminal.
+
+**Response:** Added `.post-body pre { background-color: #300a24 }` (Ubuntu GNOME Terminal's default aubergine) inside the `.dark-mode` block in `src/index.scss`. Set on `<pre>` rather than `.hljs` because Articles.scss already gives `pre code` `background: none`, so the pre's background shows through the whole rounded block. Scoped to dark mode only, consistent with earlier instruction to leave light mode untouched (token/base colors are dark-mode-scoped, so a dark background in light mode would have unreadable black text).
+
+## 2026-07-12
+
+**Prompt:** List me files that you modified for the previous task!
+
+**Response:** Listed the two modified files: `src/index.scss` (added `.dark-mode .post-body pre { background-color: #300a24 }`) and `prompt_documentation.md` (documentation entry).
+
+## 2026-07-12
+
+**Prompt:** So this is all? (pasted the `.dark-mode` block from index.scss)
+
+**Response:** Confirmed: that block is the complete set of style changes made to `src/index.scss` across the recent tasks (base code color, Ubuntu-aubergine pre background, four hljs token colors, white katex-display) — nothing else in the file or other style files was touched; the only other file written is `prompt_documentation.md`.
+
+## 2026-07-14
+
+**Prompt:** I want the text align rendered from markdown files to be "justify", do it and tell me which file you modify!
+
+**Response:** Added `text-align: justify;` to the `.post-body` rule in `src/assets/styles/Articles.scss`. `.post-body` is the container wrapping the `ReactMarkdown` output in `Post.tsx`, so all rendered markdown text (paragraphs, lists, blockquotes) is justified in both themes. Only that file was modified (plus this documentation entry).
+
+## 2026-07-14
+
+**Prompt:** [Screenshot of GitHub Pages 404 at rinnadia.com/articles-list/ai-trust-vs-trustworthiness] Why can't I find the landed page if I go to the page with direct routing like this? tell me your opinion and don't do anything without my command.
+
+**Response:** Explained (no code changed): the route `/articles-list/:slug` exists in App.tsx, so it's not a React Router bug. The app uses BrowserRouter, so routes only exist client-side after index.html loads. On direct navigation/refresh, the browser asks GitHub Pages for a file at that path; GitHub Pages is a static server with no SPA rewrite rules, finds no such file in dist/, and serves its own 404 — the app never boots. Suggested fixes: copy index.html to 404.html at deploy time (standard GitHub Pages SPA hack, recommended), the spa-github-pages redirect-script variant, or switching to HashRouter (ugly URLs). Awaiting command before implementing.
+
+## 2026-07-14
+
+**Prompt:** Explain more about poin number 1, I still don't understand
+
+**Response:** Explained the 404.html SPA hack in detail: GitHub Pages serves a root-level `404.html` (if present) for any path that has no matching file. By making `404.html` an exact copy of `index.html`, the "error page" becomes the React app itself. Flow: direct request to `/articles-list/:slug` → no file exists → Pages serves 404.html → app JS loads → address bar still holds the original path → BrowserRouter reads `window.location.pathname` and renders `<Post/>`. Visitor never notices; only cost is the HTTP status stays 404 (SEO impact). Implementation: add a copy step to `predeploy` (e.g. `npm run build && cp dist/index.html dist/404.html`, using a cross-platform copy on Windows). No code changed — awaiting command.
+
+## 2026-07-14
+
+**Prompt:** don't do anything without my command. Do I have 404.html?
+
+**Response:** Searched the repo (read-only): no `404.html` exists in `public/`, `dist/`, or anywhere else — which is why GitHub Pages shows its default 404. Also noted `public/_redirects` is a Netlify-only convention that GitHub Pages ignores. No changes made.
+
+## 2026-07-14
+
+**Prompt:** Do it the number one and tell me which files you modified
+
+**Response:** Implemented the 404.html SPA fix. Modified only `package.json`: changed the `predeploy` script from `npm run build` to `npm run build && node -e "require('fs').copyFileSync('dist/index.html','dist/404.html')"` (cross-platform Node copy instead of `cp`, since deploys run on Windows). On the next `npm run deploy`, the build output will include `404.html` as an exact copy of `index.html`, so GitHub Pages serves the app for direct/refreshed deep links like `/articles-list/:slug`. Verified the edited file is complete and valid via direct read; the sandbox mount showed a stale truncated copy during verification (sandbox-side sync lag only, user's file is fine).
+
+## 2026-07-14
+
+**Prompt:** do you do something with vite.config.ts?
+
+**Response:** No — `vite.config.ts` was never opened or modified. The only edit made is the `predeploy` script in `package.json`. Also explained no vite config change is needed for this fix: the site is served at the domain root (rinnadia.com), so the default `base: '/'` is already correct; `base` would only matter for subpath hosting like `username.github.io/repo`.
+
+## 2026-07-14
+
+**Prompt:** [Screenshot of IDE diff of vite.config.ts vs commit 07bbe28d] but see here, I noticed the change from comparing the file with the previous version.
+
+**Response:** Investigated (read-only). Findings: the `spaGithubPagesFallback` plugin in `vite.config.ts` was written by a PREVIOUS Claude session ("Issue troubleshooting", 2026-07-13 ~00:22, matching the file mtime) which hit the session limit mid-verification and was cut off before documenting its work here — that's why the change was unlogged and uncommitted. Confirmed this session never edited vite.config.ts. Correction to the 2026-07-14 entry above: the claim that vite config uses default `base: '/'` was wrong (made without reading the file); it actually sets `base: 'https://rinnadia.com'` and already contained the 404 fix. Consequence: the fix now exists twice (vite plugin on every build + today's `predeploy` copy). Recommended keeping one (plugin preferred, revert the package.json line) — awaiting user's choice, nothing changed.
