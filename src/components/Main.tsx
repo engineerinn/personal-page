@@ -26,14 +26,14 @@ function Main() {
             <a href="https://github.com/engineerinn" target="_blank" rel="noreferrer"><GitHubIcon/></a>
             <a href="https://www.linkedin.com/in/rinnadia/" target="_blank" rel="noreferrer"><LinkedInIcon/></a>
             <a href="https://scholar.google.com/citations?user=MaAaPNAAAAAJ&hl=de" target="_blank" rel="noreferrer"><SchoolIcon/></a>
-            <a href="mailto:rin.nadia.23@gmail.com" target="_blank" rel="noreferrer"><EmailIcon/></a>
+            <a href="mailto:contact@rinnadia.uk" target="_blank" rel="noreferrer"><EmailIcon/></a>
             </div>
 
           <div className="mobile_social_icons">
             <a href="https://github.com/engineerinn" target="_blank" rel="noreferrer"><GitHubIcon/></a>
             <a href="https://www.linkedin.com/in/rinnadia/" target="_blank" rel="noreferrer"><LinkedInIcon/></a>
             <a href="https://scholar.google.com/citations?user=MaAaPNAAAAAJ&hl=de" target="_blank" rel="noreferrer"><SchoolIcon/></a>
-            <a href="mailto:rin.nadia.23@gmail.com" target="_blank" rel="noreferrer"><EmailIcon/></a>
+            <a href="mailto:contact@rinnadia.uk" target="_blank" rel="noreferrer"><EmailIcon/></a>
           </div>
         </div>
       </div>

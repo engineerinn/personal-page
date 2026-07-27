@@ -14,7 +14,7 @@ function Footer() {
           <a href="https://github.com/engineerinn" target="_blank" rel="noreferrer"><GitHubIcon/></a>
           <a href="https://www.linkedin.com/in/rinnadia/" target="_blank" rel="noreferrer"><LinkedInIcon/></a>
               <a href="https://scholar.google.com/citations?user=MaAaPNAAAAAJ&hl=de" target="_blank" rel="noreferrer"><SchoolIcon/></a>
-          <a href="mailto:rin.nadia.23@gmail.com" target="_blank" rel="noreferrer"><EmailIcon/></a>
+          <a href="mailto:contact@rinnadia.uk" target="_blank" rel="noreferrer"><EmailIcon/></a>
           </h4>
       </div>
       <div id="lower-footer"><h5> <a href="https://github.com/yujisatojr/react-portfolio-template" target="_blank" rel="noreferrer">Modified Version of a Template by Yuji Sato</a></h5></div>
