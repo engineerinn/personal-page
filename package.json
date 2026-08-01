@@ -32,6 +32,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "prestart": "node scripts/build-posts-index.js",
+    "prebuild": "node scripts/build-posts-index.js",
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
