@@ -1,7 +1,7 @@
 ---
 title: AI Trust vs. AI Trustworthiness
 date: 2026-06-20
-tags: [AI, Trust, Security, Iphone]
+tags: [AI, Trust, Security]
 excerpt: Why conflating how much users trust an AI with how trustworthy it actually is leads to over-trust and under-trust — and what standards say about it.
 ---
 
