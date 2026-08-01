@@ -94,6 +94,7 @@ function toArray(v) {
 }
 
 function build() {
+  console.log("ready to be executed!");
   if (!fs.existsSync(POSTS_DIR)) {
     console.error(`[build-posts-index] posts dir not found: ${POSTS_DIR}`);
     fs.mkdirSync(POSTS_DIR, { recursive: true });
