@@ -1,22 +1,7 @@
 {
-  "generatedAt": "2026-08-01T10:26:55.310Z",
-  "count": 4,
+  "generatedAt": "2026-08-01T10:29:16.351Z",
+  "count": 3,
   "posts": [
-    {
-      "slug": "test-script-hahahahaha",
-      "title": "Optimism!",
-      "date": "2026-07-01",
-      "tags": [
-        "dream",
-        "hope",
-        "persistent",
-        "Iphone",
-        "Money"
-      ],
-      "excerpt": "test script!.",
-      "thumbnail": null,
-      "readingTime": 1
-    },
     {
       "slug": "welcome-to-my-blog",
       "title": "Welcome to My Blog",
